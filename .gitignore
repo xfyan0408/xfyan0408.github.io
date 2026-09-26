@@ -1,0 +1,7 @@
+node_modules/
+.env
+.env.*
+.staticrypt.json
+.DS_Store
+*.log
+work/

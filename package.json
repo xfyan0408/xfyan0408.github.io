@@ -1,0 +1,12 @@
+{
+  "name": "nilhil-personal-site",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "preview": "node tools/preview.mjs",
+    "lock": "node tools/lock.mjs"
+  },
+  "devDependencies": {
+    "staticrypt": "3.5.4"
+  }
+}
