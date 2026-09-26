@@ -5,10 +5,12 @@
   if (!hosts.length) return;
 
   const ns = "http://www.w3.org/2000/svg";
-  const depth = 0.11;
-  const outer = [[-0.5, 0.866], [-1, 0], [-0.5, -0.866],
-    [0.5, -0.866], [1, 0], [0.5, 0.866]];
-  const inner = outer.map(([x, y]) => [x * 0.78, y * 0.78]);
+  const depth = 0.095;
+  const bevel = 0.018;
+  const altitude = Math.sqrt(3) / 2;
+  const outer = [[-0.5, altitude], [-1, 0], [-0.5, -altitude],
+    [0.5, -altitude], [1, 0], [0.5, altitude]];
+  const inner = outer.map(([x, y]) => [x * 0.8, y * 0.8]);
   const outline = [...outer, ...inner.slice().reverse()];
   const faces = [];
   const at = ([x, y], z) => [x, y, z];
@@ -28,17 +30,35 @@
     faces.push({ vertices, normal });
   }
 
+  // Offset each edge by the same distance, including the two open end caps.
+  const inset = outline.map((point, i) => {
+    const previous = outline[(i + outline.length - 1) % outline.length];
+    const next = outline[(i + 1) % outline.length];
+    const before = normalize([previous[1] - point[1], point[0] - previous[0]]);
+    const after = normalize([point[1] - next[1], next[0] - point[0]]);
+    const scale = bevel / (1 + before[0] * after[0] + before[1] * after[1]);
+    return point.map((value, axis) => value + (before[axis] + after[axis]) * scale);
+  });
+  const frontOuter = inset.slice(0, outer.length);
+  const frontInner = inset.slice(outer.length).reverse();
+
   // Five joined strips: the sixth (bottom) edge is intentionally absent.
   for (let i = 0; i < outer.length - 1; i += 1) {
-    const strip = [outer[i], outer[i + 1], inner[i + 1], inner[i]];
+    const strip = [frontOuter[i], frontOuter[i + 1], frontInner[i + 1], frontInner[i]];
     addFace(strip.map((point) => at(point, depth)));
     addFace(strip.slice().reverse().map((point) => at(point, -depth)));
   }
   // Follow the open outline, including a cap at each lower endpoint.
   outline.forEach((point, i) => {
-    const next = outline[(i + 1) % outline.length];
-    addFace([at(point, depth), at(point, -depth),
-      at(next, -depth), at(next, depth)]);
+    const j = (i + 1) % outline.length;
+    const next = outline[j];
+    const shoulder = depth - bevel;
+    addFace([at(point, shoulder), at(point, -shoulder),
+      at(next, -shoulder), at(next, shoulder)]);
+    addFace([at(point, shoulder), at(next, shoulder),
+      at(inset[j], depth), at(inset[i], depth)]);
+    addFace([at(next, -shoulder), at(point, -shoulder),
+      at(inset[i], -depth), at(inset[j], -depth)]);
   });
 
   const marks = hosts.map((host) => {
@@ -54,16 +74,20 @@
     return { svg, polygons };
   });
 
-  const tilt = 12 * Math.PI / 180;
+  const radians = Math.PI / 180;
   const light = normalize([-0.4, -0.65, 1]);
   const camera = 4.4;
-  const initialAngle = 20 * Math.PI / 180;
   const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
   let elapsed = 0;
   let previous = null;
   let frame = null;
 
-  function render(angle) {
+  function render(time) {
+    // A 2:3 Lissajous rhythm in orientation space, repeating every 48 seconds.
+    // Bounded angles keep the open hexagon legible throughout the motion.
+    const phase = time * Math.PI * 2 / 48000;
+    const angle = (8 + 28 * Math.sin(2 * phase + Math.PI / 6)) * radians;
+    const tilt = (12 + 8 * Math.cos(3 * phase)) * radians;
     const cosine = Math.cos(angle);
     const sine = Math.sin(angle);
     const rotate = ([x, y, z]) => {
@@ -80,22 +104,22 @@
         return null;
       }
       const diffuse = Math.max(0, normal.reduce((sum, v, i) => sum + v * light[i], 0));
-      const shade = Math.round(34 + diffuse * 35);
+      const shade = Math.round(28 + diffuse * 40);
       const points = vertices.map(([vx, vy, vz]) => {
         const scale = 36 * camera / (camera - vz);
         return `${(50 + vx * scale).toFixed(2)},${(50 + vy * scale).toFixed(2)}`;
       }).join(" ");
-      return { index, points, shade, z: vertices.reduce((sum, v) => sum + v[2], 0) / 4 };
+      return { index, points, shade, z: vertices.reduce((sum, v) => sum + v[2], 0) / vertices.length };
     }).filter(Boolean).sort((a, b) => a.z - b.z);
 
     marks.forEach(({ svg, polygons }) => {
       svg.replaceChildren(...visible.map(({ index, points, shade }) => {
         const polygon = polygons[index];
-        const color = `rgb(${shade}, ${shade + 1}, ${shade + 2})`;
+        const color = `rgb(${shade}, ${shade}, ${shade})`;
         polygon.setAttribute("points", points);
         polygon.setAttribute("fill", color);
         polygon.setAttribute("stroke", color);
-        polygon.setAttribute("stroke-width", "0.25");
+        polygon.setAttribute("stroke-width", "0.12");
         polygon.setAttribute("stroke-linejoin", "round");
         return polygon;
       }));
@@ -105,7 +129,7 @@
   function animate(now) {
     if (previous !== null) elapsed += now - previous;
     previous = now;
-    render(initialAngle + elapsed * Math.PI * 2 / 14000);
+    render(elapsed);
     frame = requestAnimationFrame(animate);
   }
 
@@ -113,7 +137,7 @@
     if (frame !== null) cancelAnimationFrame(frame);
     frame = null;
     previous = null;
-    render(motion.matches ? initialAngle : initialAngle + elapsed * Math.PI * 2 / 14000);
+    render(motion.matches ? 0 : elapsed);
     if (!motion.matches && !document.hidden) frame = requestAnimationFrame(animate);
   }
 
