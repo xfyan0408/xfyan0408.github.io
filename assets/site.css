@@ -91,8 +91,110 @@
 .text-button { padding: 0; border: 0; background: transparent; color: #0f79d0; font: inherit; cursor: pointer; }
 .text-button:hover { text-decoration: underline; }
 button:focus-visible, a:focus-visible { outline: 2px solid #0f79d0; outline-offset: 4px; }
+.private-content [hidden] { display: none !important; }
+.private-content .page-actions { gap: 20px; flex-wrap: wrap; }
+.private-content .page-actions a,
+.private-content .page-actions .text-button { color: #373737; }
+.private-content .project-list {
+  margin: 26px 0 18px;
+  border-top: 1px solid #d7d7d7;
+}
+.private-content .project-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 20px;
+  padding: 22px 0;
+  border-bottom: 1px solid #d7d7d7;
+  color: #373737;
+  text-decoration: none;
+  transition: background-color .18s ease;
+}
+.private-content .project-link:visited { color: #373737; }
+.private-content .project-link:hover { background: #eaeaea; }
+.private-content .project-link:focus-visible,
+.private-content .page-actions a:focus-visible,
+.private-content .page-actions .text-button:focus-visible { outline-color: #373737; }
+.private-content .project-name { font-size: 18px; overflow-wrap: anywhere; }
+.private-content .project-status { margin: 0; color: #777; font-size: 13px; }
+.private-content .project-link .project-status { white-space: nowrap; }
+.private-content .project-arrow { color: #777; }
+.private-content .project-page h2 { margin-bottom: 8px; }
+.private-content .project-placeholder {
+  min-height: 150px;
+  margin: 28px 0 16px;
+  padding-top: 26px;
+  border-top: 1px solid #d7d7d7;
+  color: #555;
+}
+.private-content .project-placeholder p { margin: 0; }
+.access-dialog {
+  box-sizing: border-box;
+  width: min(400px, calc(100% - 32px));
+  max-width: none;
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 32px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid #c7c7c7;
+  border-radius: 3px;
+  background: #f2f2f2;
+  color: #373737;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, .24);
+}
+.access-dialog::backdrop { background: rgba(18, 18, 18, .48); }
+.access-dialog .access-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: #666;
+  font: 28px/1 Arial, sans-serif;
+  cursor: pointer;
+}
+.access-dialog .access-close:hover { background: #e6e6e6; color: #212121; }
+.access-dialog h2 {
+  margin: 0 32px 10px 0;
+  padding: 0;
+  background: none;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+.access-dialog .access-description { margin: 0; color: #707070; font-size: 14px; }
+.access-dialog .password-form { max-width: none; margin: 28px 0 0; }
+.access-dialog .password-form label { margin-bottom: 9px; font-size: 14px; font-weight: 500; }
+.access-dialog .password-field input { border-color: #bbb; color: #212121; }
+.access-dialog .password-field input:focus {
+  border-color: #555;
+  outline: 2px solid #555;
+  outline-offset: 2px;
+}
+.access-dialog .password-field input[aria-invalid="true"] { border-color: #a12622; }
+.access-dialog .password-toggle:hover { color: #212121; }
+.access-dialog .form-error { min-height: 22px; margin: 9px 0 13px; line-height: 1.6; }
+.access-dialog .primary-button {
+  width: 100%;
+  min-height: 44px;
+  border-color: #212121;
+  background: #212121;
+  font-weight: 500;
+}
+.access-dialog .primary-button:hover { border-color: #3a3a3a; background: #3a3a3a; }
+.access-dialog button:focus-visible { outline-color: #555; }
 @media screen and (max-width: 480px) {
   /* Preserve Slate's small-screen layout without its 320px minimum overflowing. */
   .inner { min-width: 0; }
   .home-content .site-mark { width: 68px; height: 68px; }
+  .private-content .project-link { gap: 12px; padding: 20px 0; }
+  .private-content .project-name { font-size: 16px; }
+  .access-dialog { padding: 28px 24px 24px; }
 }

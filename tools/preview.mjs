@@ -11,6 +11,8 @@ const routes = new Map([
   ['/private/index.html', ['private/index.html', 'text/html; charset=utf-8']],
   ['/assets/site.css', ['assets/site.css', 'text/css; charset=utf-8']],
   ['/assets/hexagon.js', ['assets/hexagon.js', 'text/javascript; charset=utf-8']],
+  ['/assets/private-access.js', ['assets/private-access.js', 'text/javascript; charset=utf-8']],
+  ['/private/payload.js', ['private/payload.js', 'text/javascript; charset=utf-8']],
   ['/assets/css/style.css', ['assets/css/style.css', 'text/css; charset=utf-8']],
   ['/assets/images/bg_hr.png', ['assets/images/bg_hr.png', 'image/png']],
   ['/assets/images/blacktocat.png', ['assets/images/blacktocat.png', 'image/png']],
