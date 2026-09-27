@@ -6,12 +6,35 @@
 
   const ns = "http://www.w3.org/2000/svg";
   const depth = 0.095;
-  const bevel = 0.018;
+  const bevel = 0.008;
   const altitude = Math.sqrt(3) / 2;
   const outer = [[-0.5, altitude], [-1, 0], [-0.5, -altitude],
     [0.5, -altitude], [1, 0], [0.5, altitude]];
   const inner = outer.map(([x, y]) => [x * 0.8, y * 0.8]);
-  const outline = [...outer, ...inner.slice().reverse()];
+  // Cut the two ends perpendicular to their sides instead of leaving acute tips.
+  const halfWidth = 0.1 * altitude;
+  [0, outer.length - 1].forEach((index) => {
+    const center = outer[index].map((value, axis) => (value + inner[index][axis]) / 2);
+    const offset = [(index === 0 ? -1 : 1) * halfWidth * altitude, halfWidth / 2];
+    outer[index] = center.map((value, axis) => value + offset[axis]);
+    inner[index] = center.map((value, axis) => value - offset[axis]);
+  });
+  const corners = [...outer, ...inner.slice().reverse()];
+  // Small rounded corners preserve the straight sides and the open bottom edge.
+  const outline = corners.flatMap((point, i) => {
+    const before = corners[(i + corners.length - 1) % corners.length];
+    const after = corners[(i + 1) % corners.length];
+    const beforeLength = Math.hypot(...before.map((value, axis) => value - point[axis]));
+    const afterLength = Math.hypot(...after.map((value, axis) => value - point[axis]));
+    const trim = Math.min(0.09, beforeLength * 0.42, afterLength * 0.42);
+    const start = point.map((value, axis) => value + (before[axis] - value) * trim / beforeLength);
+    const end = point.map((value, axis) => value + (after[axis] - value) * trim / afterLength);
+    return Array.from({ length: 5 }, (_, step) => {
+      const t = step / 4;
+      return point.map((value, axis) => (1 - t) ** 2 * start[axis] +
+        2 * (1 - t) * t * value + t ** 2 * end[axis]);
+    });
+  });
   const faces = [];
   const at = ([x, y], z) => [x, y, z];
   const normalize = (v) => {
@@ -19,15 +42,15 @@
     return v.map((value) => value / length);
   };
 
-  function addFace(vertices) {
+  function addFace(vertices, capNormal = null) {
     const a = vertices[1].map((v, i) => v - vertices[0][i]);
     const b = vertices[2].map((v, i) => v - vertices[0][i]);
-    const normal = normalize([
+    const normal = capNormal || normalize([
       a[1] * b[2] - a[2] * b[1],
       a[2] * b[0] - a[0] * b[2],
       a[0] * b[1] - a[1] * b[0]
     ]);
-    faces.push({ vertices, normal });
+    faces.push({ vertices, normal, cap: capNormal ? 1 : 0 });
   }
 
   // Offset each edge by the same distance, including the two open end caps.
@@ -39,15 +62,9 @@
     const scale = bevel / (1 + before[0] * after[0] + before[1] * after[1]);
     return point.map((value, axis) => value + (before[axis] + after[axis]) * scale);
   });
-  const frontOuter = inset.slice(0, outer.length);
-  const frontInner = inset.slice(outer.length).reverse();
-
-  // Five joined strips: the sixth (bottom) edge is intentionally absent.
-  for (let i = 0; i < outer.length - 1; i += 1) {
-    const strip = [frontOuter[i], frontOuter[i + 1], frontInner[i + 1], frontInner[i]];
-    addFace(strip.map((point) => at(point, depth)));
-    addFace(strip.slice().reverse().map((point) => at(point, -depth)));
-  }
+  // One continuous face avoids visible seams between the five sides.
+  addFace(inset.map((point) => at(point, depth)), [0, 0, 1]);
+  addFace(inset.slice().reverse().map((point) => at(point, -depth)), [0, 0, -1]);
   // Follow the open outline, including a cap at each lower endpoint.
   outline.forEach((point, i) => {
     const j = (i + 1) % outline.length;
@@ -109,8 +126,10 @@
         const scale = 36 * camera / (camera - vz);
         return `${(50 + vx * scale).toFixed(2)},${(50 + vy * scale).toFixed(2)}`;
       }).join(" ");
-      return { index, points, shade, z: vertices.reduce((sum, v) => sum + v[2], 0) / vertices.length };
-    }).filter(Boolean).sort((a, b) => a.z - b.z);
+      return { index, points, shade, cap: face.cap,
+        z: vertices.reduce((sum, v) => sum + v[2], 0) / vertices.length };
+    // Our bounded angles always show the front: draw its continuous surface last.
+    }).filter(Boolean).sort((a, b) => a.cap - b.cap || a.z - b.z);
 
     marks.forEach(({ svg, polygons }) => {
       svg.replaceChildren(...visible.map(({ index, points, shade }) => {
