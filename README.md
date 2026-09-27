@@ -1,6 +1,6 @@
 # Nanaki's Blog
 
-保留原站 Slate 的深灰页头、浅灰正文与整体风格，首页入口使用深灰色，右侧展示立体旋转的缺边六边形。公开首页 + 带密码的「具象化」。纯静态网页，继续使用原来的 GitHub Pages 网址。
+保留原站 Slate 的深灰页头、浅灰正文与整体风格，首页入口使用深灰色，带横杠的开口六边形缩小置于视口右下角，以低对比度深灰作为装饰，不带白底和边框、不拦截点击。图标参考 GC 标志的粗细与斜切比例，保留省略右下长尾的简化轮廓；绕横杠与右下斜边交点处的竖直轴匀速自转，每 60 秒转一圈。公开首页 + 带密码的「具象化」。纯静态网页，继续使用原来的 GitHub Pages 网址。
 
 ## 本地查看
 
@@ -19,7 +19,7 @@ npm run preview
 - 公开首页：`index.html`
 - 原站 Slate 样式：`assets/css/style.css`（从现有线上网站保存）
 - 私密入口和密码表单的补充样式：`assets/site.css`
-- 首页六边形的立体旋转：`assets/hexagon.js`（原生 SVG，无额外依赖；支持减少动态效果）
+- 全站右下角图标：`assets/images/open-hexagon.svg`（单个深灰实心轮廓、斜切端头，笔画厚度约为边长的三分之一，横杠右端略收短，轴两侧长度接近）；首页、密码入口、解锁后的目录和五个项目页共用，`assets/site.css` 控制绕交点竖直轴的 360° 匀速自转，每圈 60 秒，无额外依赖
 - 密码弹窗及解锁行为：`assets/private-access.js`
 - 直接访问私密链接时的背景页：`tools/password-template.html`
 - 私密正文：**仓库外**的 `D:\Workspace-1\xfyan0408-private\index.html`

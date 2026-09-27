@@ -19,17 +19,21 @@
 .private-entry a:visited,
 .private-entry a:hover,
 .private-entry a:focus { color: #212121; }
-.home-content .site-mark {
+.site-mark {
+  position: fixed;
+  right: max(20px, env(safe-area-inset-right));
+  bottom: max(20px, env(safe-area-inset-bottom));
   display: block;
-  flex: 0 0 auto;
   width: 84px;
-  height: 84px;
+  height: 50px;
   margin: 0;
   padding: 0;
   border: 0;
   box-shadow: none;
+  pointer-events: none;
+  user-select: none;
 }
-.site-mark svg, .site-mark-fallback {
+.site-mark-icon {
   display: block;
   width: 100%;
   height: 100%;
@@ -37,10 +41,13 @@
   padding: 0;
   border: 0;
   box-shadow: none;
+  /* The crossbar meets the hexagon at (84, 50), the SVG canvas center. */
+  transform-origin: 50% 50%;
+  animation: site-mark-turn 60s linear infinite;
 }
-.site-mark-fallback {
-  /* Keep the bottom gap visible when JavaScript is unavailable. */
-  transform: rotate(120deg);
+@keyframes site-mark-turn {
+  from { transform: perspective(400px) rotateY(0deg); }
+  to { transform: perspective(400px) rotateY(360deg); }
 }
 .back-link { margin: 0 0 18px; }
 .password-form { max-width: 400px; margin: 26px 0 20px; padding: 0; }
@@ -193,7 +200,12 @@ button:focus-visible, a:focus-visible { outline: 2px solid #0f79d0; outline-offs
 @media screen and (max-width: 480px) {
   /* Preserve Slate's small-screen layout without its 320px minimum overflowing. */
   .inner { min-width: 0; }
-  .home-content .site-mark { width: 68px; height: 68px; }
+  .site-mark {
+    width: 68px;
+    height: 40px;
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(12px, env(safe-area-inset-bottom));
+  }
   .private-content .project-link { gap: 12px; padding: 20px 0; }
   .private-content .project-name { font-size: 16px; }
   .access-dialog { padding: 28px 24px 24px; }

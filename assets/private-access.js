@@ -41,7 +41,7 @@
     if (!payloadPromise) {
       payloadPromise = new Promise((resolve, reject) => {
         const script = document.createElement('script');
-        script.src = new URL('payload.js', destination).href;
+        script.src = new URL('payload.js?v=corner-mark-1', destination).href;
         script.onload = () => {
           if (window.nanakiPrivatePayload) resolve(window.nanakiPrivatePayload);
           else { script.remove(); reject(new Error('Missing encrypted data')); }

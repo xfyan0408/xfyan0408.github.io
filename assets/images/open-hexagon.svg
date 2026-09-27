@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 168 100" width="168" height="100">
+  <!-- 34-unit hexagon sides, an 11-unit band, and a crossbar joined at (84, 50). -->
+  <path d="M70.175 15.055 H29.825 L9.649 50 L29.825 84.945 H70.175
+    L87.175 55.5 H108.825 L115.175 44.5 H53.325 L59.675 55.5 H74.474
+    L63.825 73.945 H36.175 L22.351 50 L36.175 26.055 H63.825 Z"
+    fill="#373737" />
+</svg>

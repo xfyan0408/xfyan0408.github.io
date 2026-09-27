@@ -10,7 +10,6 @@ const routes = new Map([
   ['/private/', ['private/index.html', 'text/html; charset=utf-8']],
   ['/private/index.html', ['private/index.html', 'text/html; charset=utf-8']],
   ['/assets/site.css', ['assets/site.css', 'text/css; charset=utf-8']],
-  ['/assets/hexagon.js', ['assets/hexagon.js', 'text/javascript; charset=utf-8']],
   ['/assets/private-access.js', ['assets/private-access.js', 'text/javascript; charset=utf-8']],
   ['/private/payload.js', ['private/payload.js', 'text/javascript; charset=utf-8']],
   ['/assets/css/style.css', ['assets/css/style.css', 'text/css; charset=utf-8']],
@@ -19,6 +18,7 @@ const routes = new Map([
   ['/assets/images/icon_download.png', ['assets/images/icon_download.png', 'image/png']],
   ['/assets/images/sprite_download.png', ['assets/images/sprite_download.png', 'image/png']],
   ['/assets/images/open-hexagon.png', ['assets/images/open-hexagon.png', 'image/png']],
+  ['/assets/images/open-hexagon.svg', ['assets/images/open-hexagon.svg', 'image/svg+xml']],
 ]);
 const server = http.createServer(async (request, response) => {
   const pathname = new URL(request.url, 'http://localhost').pathname;
